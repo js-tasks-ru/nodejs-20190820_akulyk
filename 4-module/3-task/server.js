@@ -1,6 +1,7 @@
 const url = require('url');
 const http = require('http');
 const path = require('path');
+const fse = require('fs-extra');
 
 const server = new http.Server();
 
@@ -11,6 +12,31 @@ server.on('request', (req, res) => {
 
   switch (req.method) {
     case 'DELETE':
+
+      if (pathname.indexOf('/') !== -1) {
+        res.statusCode = 400;
+        res.end('Nesting file is not supported!');
+        return;
+      }
+
+      if (!fse.existsSync(filepath)) {
+        res.statusCode = 404;
+        res.end('File not found!');
+        return;
+      }
+
+      fse.unlink(filepath, function(err) {
+        if (err) {
+          res.statusCode = 500;
+          res.end('Error deleting file!');
+
+          return;
+        }
+
+        res.statusCode = 200;
+        res.end('File delete successfully!');
+      });
+      return;
 
       break;
 
