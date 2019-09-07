@@ -3,7 +3,10 @@ const Router = require('koa-router');
 const {productsBySubcategory, productList, productById} = require('./controllers/products');
 const {categoryList} = require('./controllers/categories');
 
+
 const app = new Koa();
+
+app.use(require('koa-bodyparser')());
 
 app.use(async (ctx, next) => {
   try {
