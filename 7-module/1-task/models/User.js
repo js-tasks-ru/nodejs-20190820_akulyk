@@ -3,6 +3,22 @@ const crypto = require('crypto');
 const connection = require('../libs/connection');
 const config = require('../config');
 
+class UserNotFound extends Error {
+  constructor(message = 'Нет такого пользователя') {
+    super(message);
+    this.status = 403;
+    this.expose = true;
+  }
+}
+
+class IncorrectPassword extends Error {
+  constructor(message = 'Невереный пароль') {
+    super(message);
+    this.status = 403;
+    this.expose = true;
+  }
+}
+
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -67,5 +83,19 @@ userSchema.methods.checkPassword = async function(password) {
   const hash = await generatePassword(this.salt, password);
   return hash === this.passwordHash;
 };
+
+userSchema.statics.login = async function(email, password) {
+  const user = await this.findOne({email}, {}).select('+password +salt');
+
+  if (!user) {
+    throw new UserNotFound();
+  }
+
+  if (!await user.checkPassword(password)) {
+    throw new IncorrectPassword();
+  }
+  return user;
+};
+
 
 module.exports = connection.model('User', userSchema);
