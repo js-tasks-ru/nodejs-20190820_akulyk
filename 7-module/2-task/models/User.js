@@ -24,10 +24,21 @@ const userSchema = new mongoose.Schema({
   },
   passwordHash: {
     type: String,
+    select: false,
   },
   salt: {
     type: String,
+    select: false,
   },
+  oauth: [
+    {
+      _id: false,
+      provider: {type: String, required: true},
+      id: {type: String, required: true},
+      accessToken: String,
+      refreshToken: String,
+    },
+  ],
 }, {
   timestamps: true,
 });
