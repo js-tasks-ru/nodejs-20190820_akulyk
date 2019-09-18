@@ -1,6 +1,7 @@
 const Koa = require('koa');
 const uuid = require('uuid/v4');
 const Router = require('koa-router');
+const serve = require('koa-static');
 const handleMongooseValidationError = require('./libs/validationErrors');
 const mustBeAuthenticated = require('./libs/mustBeAuthenticated');
 const {recommendationsList} = require('./controllers/recommendations');
@@ -18,6 +19,7 @@ const Session = require('./models/Session');
 
 const app = new Koa();
 
+app.use(serve(__dirname +'/public'));
 app.use(require('koa-bodyparser')());
 
 app.use(async (ctx, next) => {
@@ -84,7 +86,7 @@ router.post('/confirm', confirm);
 router.get('/orders', mustBeAuthenticated, getOrdersList);
 router.post('/orders', mustBeAuthenticated, handleMongooseValidationError, checkout);
 
-router.get('/messages', messageList);
+router.get('/messages', mustBeAuthenticated, messageList);
 
 app.use(router.routes());
 
