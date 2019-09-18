@@ -22,7 +22,6 @@ function socket(server) {
 
   io.on('connection', function(socket) {
     socket.on('message', async (msg) => {
-      console.log(msg)
       const message = new Message({
         text: msg,
         user: socket.user.displayName,
